@@ -60,7 +60,7 @@ function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8090/api/auth/register",
+        "https://tt-backend-wld3.onrender.com/api/auth/register",
         {
           name: formData.name.trim(),
           email: formData.email.trim(),
