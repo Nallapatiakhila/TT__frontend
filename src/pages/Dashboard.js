@@ -345,7 +345,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton,
 } from "@mui/material";
 import {
   Map,
@@ -381,6 +380,19 @@ function Dashboard() {
   const [messages, setMessages] = useState([]);
 
   const [flightDetailsOpen, setFlightDetailsOpen] = useState(false);
+
+  const BACKEND_URL = "http://localhost:8090";
+
+  const getPlacePhotoUrl = (day) => {
+    if (day.photoUrl) return day.photoUrl;
+    if (day.photoReference) {
+      return `${BACKEND_URL}/api/trip/photo?photoReference=${encodeURIComponent(day.photoReference)}`;
+    }
+    if (day.place) {
+      return `${BACKEND_URL}/api/trip/photo?name=${encodeURIComponent(day.place)}`;
+    }
+    return `https://picsum.photos/400/250?random=${Math.floor(Math.random() * 1000)}`;
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem("smartplan_last");
@@ -427,7 +439,18 @@ function Dashboard() {
         budget,
       });
 
-      setPlan(res.data.plan || []);
+      const resolvedPlan = (res.data.plan || []).map((day) => ({
+        ...day,
+        photoUrl:
+          day.photoUrl ||
+          (day.photoReference
+            ? `${BACKEND_URL}/api/trip/photo?photoReference=${encodeURIComponent(day.photoReference)}`
+            : day.place
+            ? `${BACKEND_URL}/api/trip/photo?name=${encodeURIComponent(day.place)}`
+            : undefined),
+      }));
+
+      setPlan(resolvedPlan);
       setAiExplanation(res.data.aiExplanation || "");
       setTotalCost(res.data.totalCost || 0);
       setFlightCost(res.data.flightCost || 0);
@@ -502,9 +525,19 @@ function Dashboard() {
     setTo(trip.toDate || "");
 
     const loadedPlan = Array.isArray(trip.plan) ? trip.plan : [];
-    setPlan(loadedPlan);
+    const resolvedPlan = loadedPlan.map((day) => ({
+      ...day,
+      photoUrl:
+        day.photoUrl ||
+        (day.photoReference
+          ? `${BACKEND_URL}/api/trip/photo?photoReference=${encodeURIComponent(day.photoReference)}`
+          : day.place
+          ? `${BACKEND_URL}/api/trip/photo?name=${encodeURIComponent(day.place)}`
+          : undefined),
+    }));
+    setPlan(resolvedPlan);
     setTotalCost(
-      loadedPlan.reduce((sum, day) => sum + (day.dailyCost || 0), 0)
+      resolvedPlan.reduce((sum, day) => sum + (day.dailyCost || 0), 0)
     );
     setAiExplanation(trip.aiExplanation || "");
     setFlightCost(trip.flightCost || 0);
@@ -699,13 +732,13 @@ function Dashboard() {
                   <CardMedia
                     component="img"
                     height="200"
-                    image={
-                      day.photoUrl
-                        ? day.photoUrl
-                        : "https://picsum.photos/400/250?random=" + (index + 1)
-                    }
-                    alt={day.place}
+                    image={getPlacePhotoUrl(day)}
+                    alt={day.place || "Trip image"}
                     sx={{ objectFit: "cover" }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/400x250?text=Image+Not+Available";
+                    }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography variant="h6" component="h3" gutterBottom>
