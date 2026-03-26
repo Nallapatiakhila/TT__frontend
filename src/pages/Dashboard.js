@@ -381,7 +381,7 @@ function Dashboard() {
 
   const [flightDetailsOpen, setFlightDetailsOpen] = useState(false);
 
-  const BACKEND_URL = "http://localhost:8090";
+  const BACKEND_URL = "https://tt-backend-wld3.onrender.com";
 
   const getPlacePhotoUrl = (day) => {
     if (day.photoUrl) return day.photoUrl;
@@ -431,7 +431,7 @@ function Dashboard() {
     setSaved(false);
 
     try {
-      const res = await axios.post("http://localhost:8090/api/trip/generate", {
+      const res = await axios.post("https://tt-backend-wld3.onrender.com/api/trip/generate", {
         destination: destination.trim(),
         fromLocation: fromLocation.trim(),
         from,
@@ -492,7 +492,7 @@ function Dashboard() {
     }
 
     try {
-      await axios.post("http://localhost:8090/api/trip/save", {
+      await axios.post("https://tt-backend-wld3.onrender.com/api/trip/save", {
         destination,
         fromLocation,
         from,
@@ -509,7 +509,7 @@ function Dashboard() {
 
   const loadSavedTrips = async () => {
     try {
-      const res = await axios.get("http://localhost:8090/api/trip/saved");
+      const res = await axios.get("https://tt-backend-wld3.onrender.com/api/trip/saved");
       setSavedTrips(res.data || []);
       setSavedDialogOpen(true);
     } catch (e) {
@@ -561,7 +561,7 @@ function Dashboard() {
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      const res = await axios.post("http://localhost:8090/api/ai/destination", {
+      const res = await axios.post("https://tt-backend-wld3.onrender.com/api/ai/destination", {
         mood: chatInput.trim(),
       });
 
