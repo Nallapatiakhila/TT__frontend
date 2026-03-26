@@ -46,7 +46,7 @@ function OTP() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8090/api/auth/verify-otp",
+        "https://tt-backend-wld3.onrender.com/api/auth/verify-otp",
         {
           email: email.trim(),
           otp: otp.trim(),
